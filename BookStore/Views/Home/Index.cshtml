@@ -1,0 +1,65 @@
+﻿@model IEnumerable<BookStore.Models.Book>
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<h1>Books</h1>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Category.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Price)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Category.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Price)
+                </td>
+                <td>
+                     <button type="button" onclick="add(@item.Id)" class="btn btn-primary">Add to cart</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@section Scripts{
+    <script>
+        user = "@User.Identity?.Name?.ToString()";
+        async function add(BookId) {
+            if(user === ""){
+                window.location.replace("/Identity/Account/Login");
+            }
+            else
+            {
+                try{
+                    var response = await fetch(`/Cart/AddItem?BookId=${BookId}`);
+                    if(response.status==200){
+                        var result = await response.json();
+                        var cartCountEL = document.getElementById("cartCount");
+                        cartCountEL.innerHTML = result;
+                       
+                        }
+                }
+                catch(err){
+                    console.log(err)
+                }
+            }
+        }
+    </script>
+}
